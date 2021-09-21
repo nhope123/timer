@@ -1,10 +1,12 @@
 import React,{ useState } from 'react';
+import './timerInput.css';
 
 export interface ITimerInputProps {
   label: string,
   count: string,
   max: number,
-  callback: (num:string)=>void
+  callback: (num:string)=>void,
+  color: string
 }
 
 const TimerInput = (props: ITimerInputProps) => {
@@ -18,16 +20,16 @@ const TimerInput = (props: ITimerInputProps) => {
 
   }
   return (
-    <div>
+    <div className={'timer-input'} >
       <div >{props.label}</div>
       {
         (!isDisplay)?
         (<div>
           <input type="number" value={time} tabIndex={0} max={props.max} min={0} 
                 onChange={event =>setTime(event.target.value)} 
-                onBlur={updateTimer}  />
+                onBlur={updateTimer} autoFocus />
         </div>) :
-        <div onClick={()=>setIsDisplay(!isDisplay)} >{props.count}</div>
+        <div onClick={()=>setIsDisplay(!isDisplay)} className={`${props.color}`} >{(parseInt(props.count) < 10)? ('0' + props.count): props.count}</div>
       }
     </div>
   );

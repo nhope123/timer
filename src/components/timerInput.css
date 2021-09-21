@@ -1,0 +1,9 @@
+.timer-input{
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  border: 1px solid red;
+}

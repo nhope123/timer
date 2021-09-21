@@ -1,0 +1,13 @@
+.timer-display{
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  max-width: 450px;
+  padding: 20px;
+  border: 2px solid blue;
+
+}
+
+.red-text{ color: red; }
