@@ -1,39 +1,87 @@
-import React, { useContext } from 'react'
-import TimerContext from '../context/TimerContext'
-import ScrollPicker from './ScrollPicker'
+import React, { useState } from 'react'
+import ValueInput from './ValueInput'
 
-const timeValueGenerator = (value: number): string[] =>{
-  let result: string[] = []
-  for(let x = 0; x < value; x++){
-    result.push(
-      (x < 10)? `0${x}`: `${x}`
-    )
-  }
-  return result
+interface CountDownTimer{
+  hour: string,
+  minute: string,
+  second: string
 }
 
-const hour =  timeValueGenerator(100)
-//const minutes =  timeValueGenerator(60)
-//const seconds =  timeValueGenerator(60)
+const defaultTime: CountDownTimer = {
+  hour: '00',
+  minute: '00',
+  second: '00'
+}
 
-
+let interval: NodeJS.Timer
 
 const Timer = () => {
-  const {timer, setTimer} = useContext(TimerContext)
+  const [timer, setTimer] = useState(defaultTime)
+  const [isStart, setIsStart] = useState(false)
 
-  const getValue = (name:string, value: string ) =>{
-    console.log(`name: ${name}, value:${value}`);
-    setTimer(name,value)
+  const _setTimer = (name: string, value: string) =>{
+    setTimer(state => ({...state, [name]: value}))
   }
-console.log(timer?.hour);
 
-  const hourProps = {label: 'hour',value: {'hour': timer?.hour}, options:{'hour':hour}, callback: ()=>getValue }
+  const countDown = () =>{
+    
+    let time = (parseInt(timer.hour) * 3600) + (parseInt(timer.minute) * 60) + parseInt(timer.second)
+    
+    interval = setInterval(
+      ()=>{
+        
+        if(time > 0 ){
+          setIsStart(()=>true)
+          time--
+          
+        let hour = Math.floor(time / 3600)
+        let minute = Math.floor((time - (hour * 3600))/ 60)
+        setTimer({hour: hour.toString(), minute: minute.toString(), second: (time - (hour * 3600 + minute * 60)).toString() })
+        console.log(`run:${isStart}`);
+        }
+        else if (time === 0 ){
+          console.log(isStart);
+          
+          clearInterval(interval)
+          setIsStart(false)
+          const audio = new Audio('https://orangefreesounds.com/wp-content/uploads/2021/02/Alarm-clock-bell-ringing-sound-effect.mp3')
+          audio.play()
+        }
+        
+        
+      }
+      ,1000)
+  }
+
+  const resetTimer = ()=>{
+    clearInterval(interval) 
+    setIsStart(false)
+    setTimer(defaultTime)
+  }
+
+  const pauseTimer = ()=>{
+    clearInterval(interval) 
+    setIsStart(false)
+  }
+  
+  
   return (
     <div>
-      <div >
-        <ScrollPicker {...hourProps} />
+      <div > 
+        <ValueInput {...{label: 'hour', value: timer.hour, callback: _setTimer, max: 100}}     />
+        <div >{':'}</div>
+        <ValueInput {...{label: 'minute', value: timer.minute, max:59, callback: _setTimer}}     />
+        <div >{':'}</div>
+        <ValueInput {...{label: 'second', value: timer.second, max:59, callback: _setTimer}}     />
       </div>
-      <div ></div>
+      <div > 
+        {
+          (!isStart)?
+          <button type={'button'} onClick={countDown} >{'Start'}</button> :
+          <button type={'button'} onClick={()=>pauseTimer()}>{'Stop'}</button>
+        }
+        <button type={'button'} onClick={()=>resetTimer()}>{'Reset'}</button>
+      </div>
     </div>
   )
 }
